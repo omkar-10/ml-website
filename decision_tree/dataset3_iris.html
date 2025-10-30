@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decision Tree (Iris.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from google.colab import drive
+from sklearn import tree
+import matplotlib.pyplot as plt
+
+# 1. Mount Google Drive and Load Data
+drive.mount('/content/drive')
+file_path = "/content/drive/My Drive/Copy of Copy of Iris.csv" 
+try:
+    df = pd.read_csv(file_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    exit()
+print("Data loaded successfully.")
+
+# 2. Prepare Data
+df.dropna(inplace=True)
+try:
+    feature_names = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm']
+    X = df[feature_names]
+    y = df['Species']
+    class_names = list(df['Species'].unique())
+except KeyError:
+    print("Error: Could not find standard Iris columns. Using fallback.")
+    X = df.iloc[:, 0:4]
+    y = df.iloc[:, -1]
+    feature_names = list(X.columns)
+    class_names = list(y.unique())
+
+
+# 3. Split Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Initialize and Train Model
+# --- CRITICAL FOR YOUR EXAM ---
+# criterion='entropy' tells the model to use Information Gain.
+# max_depth=3 is a common choice for this simple dataset.
+model = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=42)
+model.fit(X_train, y_train)
+
+# 5. Evaluate Model
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\nModel Performance (Decision Tree):")
+print(f"Accuracy: {accuracy:.4f}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Visualize the Tree
+plt.figure(figsize=(12,8))
+tree.plot_tree(model, feature_names=feature_names, class_names=class_names, filled=True)
+plt.title("Decision Tree Visualization (Iris)")
+plt.show()
+</pre>
+</body>
+</html>

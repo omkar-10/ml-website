@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bagging (creditcard.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from google.colab import drive
+
+# 1. Mount Google Drive and Load Data
+drive.mount('/content/drive')
+file_path = "/content/drive/My Drive/creditcard.csv" 
+try:
+    df = pd.read_csv(file_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    exit()
+print("Data loaded successfully.")
+
+# 2. Prepare Data
+# No categorical features to encode. No scaling needed for Random Forest.
+X = df.drop('Class', axis=1)
+y = df['Class']
+
+# 3. Split Data
+# --- CRITICAL: stratify=y ensures the imbalance is the same in train and test sets ---
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# 4. Initialize and Train Model
+# --- CRITICAL: class_weight='balanced' tells the model to pay more attention
+# to the minority class (fraud) when building the trees.
+model = RandomForestClassifier(n_estimators=100, 
+                               class_weight='balanced', 
+                               random_state=42,
+                               n_jobs=-1) # n_jobs=-1 uses all available CPU cores
+model.fit(X_train, y_train)
+
+# 5. Evaluate Model
+y_pred = model.predict(X_test)
+print(f"\nModel Performance (Random Forest):")
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\nClassification Report (Focus on Recall for Class 1):")
+print(classification_report(y_test, y_pred))
+</pre>
+<br>
+<p><a href="index.html">&larr; Back to Dataset Selection</a></p>
+</body>
+</html>

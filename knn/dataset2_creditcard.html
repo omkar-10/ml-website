@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>k-NN (creditcard.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report
+from google.colab import drive
+
+# --- WARNING: k-NN is VERY SLOW for large datasets like this! ---
+# This code may take a long time to run the .predict() step.
+
+# 1. Mount Google Drive and Load Data
+# drive.mount('/content/drive')
+# file_path = "/content/drive/My Drive/creditcard.csv" 
+# df = pd.read_csv(file_path)
+# print("Data loaded successfully.")
+
+# 2. Prepare Data
+# No categorical features, but we MUST scale everything
+# X = df.drop('Class', axis=1)
+# y = df['Class']
+
+# 3. Split Data
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# 4. Preprocessing
+# scaler = StandardScaler()
+# X_train_scaled = scaler.fit_transform(X_train)
+# X_test_scaled = scaler.transform(X_test)
+
+# 5. Initialize and Train Model
+# model = KNeighborsClassifier(n_neighbors=5)
+# model.fit(X_train_scaled, y_train)
+
+# 6. Evaluate Model
+# print("Predicting... This may take several minutes.")
+# y_pred = model.predict(X_test_scaled)
+# print("\nClassification Report (Focus on Recall for Class 1):")
+# print(classification_report(y_test, y_pred))
+
+print("Code placeholder for creditcard.csv.")
+print("WARNING: k-NN is extremely slow on this large dataset.")
+</pre>
+</body>
+</html>

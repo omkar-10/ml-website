@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>k-NN (Iris.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
+from google.colab import drive
+
+# 1. Mount Google Drive and Load Data
+drive.mount('/content/drive')
+file_path = "/content/drive/My Drive/Copy of Copy of Iris.csv" 
+try:
+    df = pd.read_csv(file_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    exit()
+print("Data loaded successfully.")
+
+# 2. Prepare Data
+df.dropna(inplace=True)
+try:
+    features = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm']
+    X = df[features]
+    y = df['Species']
+except KeyError:
+    print("Error: Could not find standard Iris columns. Using fallback.")
+    X = df.iloc[:, 0:4]
+    y = df.iloc[:, -1]
+
+# 3. Split Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Feature Scaling
+# --- CRITICAL FOR k-NN ---
+# Even though these are all 'Cm', their scales (ranges) are different. We must scale.
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 5. Initialize and Train Model
+model = KNeighborsClassifier(n_neighbors=3) # k=3 is also a common default
+model.fit(X_train_scaled, y_train)
+
+# 6. Evaluate Model
+y_pred = model.predict(X_test_scaled)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\nModel Performance (k-NN, k=3):")
+print(f"Accuracy: {accuracy:.4f}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+</pre>
+</body>
+</html>

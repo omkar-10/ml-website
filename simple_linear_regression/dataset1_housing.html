@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SLR (housing.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+
+# 1. Load Data
+try:
+    df = pd.read_csv("housing.csv")
+except FileNotFoundError:
+    print("Make sure 'housing.csv' is uploaded to your Colab environment.")
+    exit()
+
+# 2. Prepare Data
+# Simple approach: drop any rows with missing values to keep it simple
+df.dropna(subset=['median_income', 'median_house_value'], inplace=True)
+
+# Define X (features) and y (target)
+# X must be a 2D array (or DataFrame), hence the double brackets
+X = df[['median_income']]
+y = df['median_house_value']
+
+# 3. Split Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Initialize and Train Model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# 5. Get Results
+intercept = model.intercept_
+coefficient = model.coef_[0]
+
+print(f"Model Equation: Y = {coefficient:.2f} * X + {intercept:.2f}")
+print(f"Coefficient (β₁ - effect of median_income): {coefficient:.2f}")
+print(f"Intercept (β₀ - baseline value): {intercept:.2f}")
+
+# 6. Evaluate Model
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"\nModel Performance on Test Set:")
+print(f"Mean Squared Error (MSE): {mse:.2f}")
+print(f"R-squared (R²): {r2:.4f}")
+</pre>
+</body>
+</html>

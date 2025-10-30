@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>K-Means (Iris.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+from google.colab import drive
+import matplotlib.pyplot as plt
+
+# 1. Mount Google Drive and Load Data (from CSV)
+drive.mount('/content/drive')
+
+# --- IMPORTANT: Update this path to your file ---
+file_path = "/content/drive/Shared with me/Ml datasets/k means/Iris.csv" 
+
+try:
+    df = pd.read_csv(file_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    print("Please double-check your Google Drive file path.")
+    exit()
+
+print("Data loaded successfully from Iris.csv.")
+print(df.head())
+
+# 2. Prepare Data for Clustering
+# We must drop non-numeric columns and the 'Id' column.
+# For K-Means (unsupervised), we MUST drop the 'Species' label.
+# We only keep 'y_true' to check our work at the end.
+try:
+    X = df.drop(['Id', 'Species'], axis=1)
+    y_true = df['Species'] # Keep the real answer for comparison
+    feature_names = X.columns
+except KeyError:
+    print("Error: Could not find 'Id' or 'Species' columns.")
+    # Fallback if columns are named differently
+    X = df.iloc[:, 1:5] 
+    y_true = df.iloc[:, -1]
+    feature_names = X.columns
+
+print("\nFeatures selected for clustering:")
+print(feature_names)
+
+# 3. Feature Scaling
+# --- CRITICAL FOR K-MEANS ---
+# K-Means is distance-based, so features with large scales
+# (like SepalLengthCm) will dominate features with small scales (like PetalWidthCm).
+# We MUST scale the data to have a mean of 0 and std dev of 1.
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 4. Initialize and Train K-Means Model
+# We know the Iris dataset has 3 species, so we set k=3
+k = 3
+model = KMeans(n_clusters=k, n_init=10, random_state=42)
+model.fit(X_scaled)
+
+# 5. Get Results
+cluster_labels = model.labels_
+centroids = model.cluster_centers_
+
+print(f"\nModel Centroids (scaled):\n{centroids}")
+
+# 6. Evaluate Model (Unsupervised)
+# 'Silhouette Score' is the standard metric.
+# It measures how well-separated the clusters are.
+# (Score is -1 to 1, where > 0 is good, and 1 is perfect)
+sil_score = silhouette_score(X_scaled, cluster_labels)
+print(f"\nSilhouette Score (for k={k}): {sil_score:.4f}")
+
+# 7. (Optional) Compare to True Labels
+# This is a special case since we *have* the real answers.
+# Note: K-Means labels (0,1,2) will not match 'Species' labels directly.
+# (e.g., 'Iris-setosa' might be 'Cluster 1', 'Iris-virginica' might be 'Cluster 0')
+results = pd.DataFrame({'KMeans_Label': cluster_labels, 'True_Species': y_true})
+print("\nComparison of K-Means Labels vs. True Species (first 10 rows):")
+print(results.head(10))
+</pre>
+</body>
+</html>

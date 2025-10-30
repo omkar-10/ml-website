@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Boosting (creditcard.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from google.colab import drive
+
+# --- WARNING: This is an advanced application ---
+# Gradient Boosting is very sensitive to class imbalance and can easily overfit.
+# Unlike Random Forest, 'class_weight' is not a simple parameter here.
+# Advanced methods (like SMOTE) or different libraries (like XGBoost) are
+# often needed for good performance.
+
+# 1. Mount Google Drive and Load Data
+# drive.mount('/content/drive')
+# file_path = "/content/drive/My Drive/creditcard.csv" 
+# df = pd.read_csv(file_path)
+# print("Data loaded successfully.")
+
+# 2. Prepare Data
+# X = df.drop('Class', axis=1)
+# y = df['Class']
+
+# 3. Split Data
+# --- CRITICAL: Must stratify! ---
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# 4. Initialize and Train Model
+# This basic model will likely have VERY POOR recall for Class 1 (fraud)
+# model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42)
+# model.fit(X_train, y_train)
+
+# 5. Evaluate Model
+# y_pred = model.predict(X_test)
+# print(f"\nModel Performance (Gradient Boosting):")
+# print("\nConfusion Matrix:")
+# print(confusion_matrix(y_test, y_pred))
+# print("\nClassification Report (Expect POOR Recall for Class 1):")
+# print(classification_report(y_test, y_pred))
+
+print("Code placeholder for creditcard.csv with GradientBoosting.")
+print("WARNING: This is a difficult task. This simple model will likely perform poorly on fraud detection.")
+</pre>
+<br>
+<p><a href="index.html">&larr; Back to Dataset Selection</a></p>
+</body>
+</html>

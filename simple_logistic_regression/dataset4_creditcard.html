@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Logistic (creditcard.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from google.colab import drive
+
+# 1. Mount Google Drive and Load Data
+drive.mount('/content/drive')
+
+# --- IMPORTANT: This path is based on your image ---
+file_path = "/content/drive/My Drive/creditcard.csv" 
+
+try:
+    df = pd.read_csv(file_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    exit()
+except Exception as e:
+    print(f"An error occurred: {e}")
+    exit()
+
+print("Data loaded successfully.")
+print(f"Class distribution:\n{df['Class'].value_counts(normalize=True)}")
+
+# 2. Prepare Data
+# This dataset is very clean, no NaNs.
+# For Simple Logistic Regression, we will predict 'Class' using only 'Amount'
+X = df[['Amount']]
+y = df['Class'] # Target is 'Class' (0 = No Fraud, 1 = Fraud)
+
+# 3. Split Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y) # stratify=y is CRITICAL for imbalance
+
+# 4. Feature Scaling
+# 'Amount' has a huge range, so scaling is essential.
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 5. Initialize and Train Model
+# --- CRITICAL: Use class_weight='balanced' to handle imbalance ---
+model = LogisticRegression(random_state=42, class_weight='balanced')
+model.fit(X_train_scaled, y_train)
+
+# 6. Get Results
+intercept = model.intercept_[0]
+coefficient = model.coef_[0][0]
+print(f"\nModel Equation (Log-Odds): log(p/(1-p)) = {coefficient:.2f} * (scaled_Amount) + {intercept:.2f}")
+
+# 7. Evaluate Model
+y_pred = model.predict(X_test_scaled)
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"\nModel Performance on Test Set:")
+print(f"--- WARNING: Accuracy is a misleading metric here! ---")
+print(f"Overall Accuracy: {accuracy:.4f}")
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\nClassification Report (Focus on Recall for Class 1):")
+print(classification_report(y_test, y_pred))
+</pre>
+</body>
+</html>

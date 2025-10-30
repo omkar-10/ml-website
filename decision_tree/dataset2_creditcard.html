@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decision Tree (creditcard.csv)</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<pre>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from google.colab import drive
+
+# 1. Mount Google Drive and Load Data
+drive.mount('/content/drive')
+file_path = "/content/drive/My Drive/creditcard.csv" 
+try:
+    df = pd.read_csv(file_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    exit()
+print("Data loaded successfully.")
+
+# 2. Prepare Data
+# No categorical features to encode. No scaling needed.
+X = df.drop('Class', axis=1)
+y = df['Class']
+
+# 3. Split Data
+# --- CRITICAL: stratify=y ensures the imbalance is the same in train and test sets ---
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# 4. Initialize and Train Model
+# --- CRITICAL FOR YOUR EXAM ---
+# We use criterion='entropy' for Information Gain.
+# We use class_weight='balanced' to handle the severe imbalance.
+# max_depth=10 is used to prevent the tree from becoming massive and overfitting.
+model = DecisionTreeClassifier(criterion='entropy', 
+                               class_weight='balanced', 
+                               max_depth=10, 
+                               random_state=42)
+model.fit(X_train, y_train)
+
+# 5. Evaluate Model
+y_pred = model.predict(X_test)
+print(f"\nModel Performance (Decision Tree):")
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\nClassification Report (Focus on Recall for Class 1):")
+print(classification_report(y_test, y_pred))
+</pre>
+</body>
+</html>
