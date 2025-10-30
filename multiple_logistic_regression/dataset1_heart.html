@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Multiple Logistic (heart.csv)</title>
-    <meta charset="UTF-8">
-</head>
-<body>
-<pre>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <pre>
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -16,61 +16,58 @@ from google.colab import drive
 
 # 1. Mount Google Drive and Load Data
 drive.mount('/content/drive')
-file_path = "/content/drive/My Drive/heart.csv" 
-try:
-    df = pd.read_csv(file_path)
-except FileNotFoundError:
-    print(f"Error: File not found at {file_path}")
-    exit()
-print("Data loaded successfully.")
+
+file_path = "/content/drive/My Drive/Datasets/logistic/heart.csv" 
+df = pd.read_csv(file_path)
+print("✅ Data loaded successfully.")
+print("\nColumns in the dataset:")
+print(df.columns.tolist())
 
 # 2. Prepare Data
 df.dropna(inplace=True)
 
-# Define feature types
-# We must separate numeric and categorical features for preprocessing
-numeric_features = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-categorical_features = ['sex', 'cp', 'fbs', 'restecg', 'exang', 'slope', 'ca', 'thal']
-target = 'target'
+# Define feature groups (Kaggle version)
+numeric_features = ['Age', 'RestingBP', 'Cholesterol', 'MaxHR', 'Oldpeak']
+categorical_features = ['Sex', 'ChestPainType', 'FastingBS', 'RestingECG', 'ExerciseAngina', 'ST_Slope']
+target = 'HeartDisease'
 
 X = df[numeric_features + categorical_features]
 y = df[target]
 
 # 3. Split Data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-# 4. Preprocessing Pipeline
-# Create transformers
+# 4. Preprocessing
 numeric_transformer = StandardScaler()
-categorical_transformer = OneHotEncoder(handle_unknown='ignore') # handle_unknown is safer
+categorical_transformer = OneHotEncoder(handle_unknown='ignore')
 
-# Create the preprocessor with ColumnTransformer
 preprocessor = ColumnTransformer(
     transformers=[
         ('num', numeric_transformer, numeric_features),
         ('cat', categorical_transformer, categorical_features)
     ])
 
-# 5. Apply Preprocessing
-# We fit AND transform on the training data
 X_train_processed = preprocessor.fit_transform(X_train)
-# We ONLY transform on the test data (to prevent data leakage)
 X_test_processed = preprocessor.transform(X_test)
 
-# 6. Initialize and Train Model
-model = LogisticRegression(random_state=42, max_iter=1000) # max_iter increased for convergence
+# 5. Train Logistic Regression Model
+model = LogisticRegression(random_state=42, max_iter=1000)
 model.fit(X_train_processed, y_train)
 
-# 7. Evaluate Model
+# 6. Evaluate Model
 y_pred = model.predict(X_test_processed)
-accuracy = accuracy_score(y_test, y_pred)
 
-print(f"\nModel Performance on Test Set:")
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\n🎯 Model Performance on Test Set:")
 print(f"Accuracy: {accuracy:.4f}")
+
 print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
+
 print("\nClassification Report:")
 print(classification_report(y_test, y_pred))
-</pre>
-</body>
+
+</pre
+    >
+  </body>
 </html>

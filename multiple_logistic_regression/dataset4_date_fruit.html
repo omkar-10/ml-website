@@ -1,49 +1,91 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Multiple Logistic (Date_Fruit_Datasets.csv)</title>
-    <meta charset="UTF-8">
-</head>
-<body>
-<pre>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <pre>
+# --- Logistic Regression on Date Fruit Dataset (Multiclass Classification) ---
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from google.colab import drive
 
-# 1. Mount Google Drive and Load Data
-# drive.mount('/content/drive')
-# file_path = "/content/drive/My Drive/Date_Fruit_Datasets.xlsx - Date_Fruit_Datasets.csv" 
-# df = pd.read_csv(file_path)
-# print("Data loaded successfully.")
+# 1️⃣ Mount Google Drive
+drive.mount('/content/drive')
 
-# 2. Prepare Data
-# df.dropna(inplace=True)
-# features = ['PERIMETER', 'AREA', 'MAJOR_AXIS_LENGTH']
-# target = 'Class' # This target may have multiple fruit classes
-# X = df[features]
-# y = df[target]
+# 2️⃣ Load the Dataset
+file_path = "/content/drive/My Drive/Datasets/logistic/Date_Fruit_Datasets.csv"
+df = pd.read_csv(file_path)
+print("✅ Data loaded successfully.")
+print("\n🔹 Columns available in dataset:")
+print(df.columns.tolist())
 
-# 3. Split Data
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# 3️⃣ Data Cleaning
+df.dropna(inplace=True)
+print(f"\n✅ After cleaning: {df.shape[0]} rows and {df.shape[1]} columns.")
 
-# 4. Feature Scaling
-# scaler = StandardScaler()
-# X_train_scaled = scaler.fit_transform(X_train)
-# X_test_scaled = scaler.transform(X_test)
+# 4️⃣ Identify Features and Target
+# 👉 Adjust these based on actual column names printed above
+# Common column names in Date_Fruit_Datasets are like:
+# ['AREA', 'PERIMETER', 'MAJOR_AXIS', 'MINOR_AXIS', 'ECCENTRICITY', 'Class']
 
-# 5. Initialize and Train Model
-# model = LogisticRegression(multi_class='multinomial', solver='lbfgs', random_state=42)
-# model.fit(X_train_scaled, y_train)
+# Try to use flexible matching (handles upper/lowercase variations)
+columns_lower = [c.lower() for c in df.columns]
 
-# 6. Evaluate Model
-# y_pred = model.predict(X_test_scaled)
-# accuracy = accuracy_score(y_test, y_pred)
-# print(f"Accuracy: {accuracy:.4f}")
+# Helper to find best matches
+def find_col(name):
+    for col in df.columns:
+        if name.lower() in col.lower():
+            return col
+    return None
 
-print("Code placeholder for Date_Fruit_Datasets.csv. Multiclass example.")
-</pre>
-</body>
+area_col = find_col("area")
+peri_col = find_col("perimeter")
+major_col = find_col("major")
+
+features = [area_col, peri_col, major_col]
+target = find_col("class")
+
+# Safety check
+if None in features or target is None:
+    raise ValueError(f"❌ Could not find one or more required columns. Found features={features}, target={target}")
+
+print(f"\n✅ Using features: {features}")
+print(f"✅ Using target: {target}")
+
+X = df[features]
+y = df[target]
+
+# 5️⃣ Split Data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# 6️⃣ Feature Scaling
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# 7️⃣ Train Logistic Regression Model (Multiclass)
+model = LogisticRegression(multi_class='multinomial', solver='lbfgs', random_state=42, max_iter=1000)
+model.fit(X_train_scaled, y_train)
+
+# 8️⃣ Evaluate Model
+y_pred = model.predict(X_test_scaled)
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"\n🎯 Model Accuracy: {accuracy:.4f}")
+print("\n📊 Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print("\n📈 Classification Report:")
+print(classification_report(y_test, y_pred))
+
+</pre
+    >
+  </body>
 </html>

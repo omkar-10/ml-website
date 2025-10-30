@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Multiple Logistic (creditcard.csv)</title>
-    <meta charset="UTF-8">
-</head>
-<body>
-<pre>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <pre>
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -15,45 +15,46 @@ from sklearn.metrics import classification_report
 from google.colab import drive
 
 # 1. Mount Google Drive and Load Data
-# drive.mount('/content/drive')
-# file_path = "/content/drive/My Drive/creditcard.csv" 
-# df = pd.read_csv(file_path)
-# print("Data loaded successfully.")
+drive.mount('/content/drive')
+file_path = "/content/drive/My Drive/Datasets/logistic/creditcard.csv" 
+df = pd.read_csv(file_path)
+print("Data loaded successfully.")
 
 # 2. Prepare Data
 # Features V1-V28 are already scaled. 'Time' and 'Amount' are not.
-# numeric_features_to_scale = ['Time', 'Amount']
-# passthrough_features = [f'V{i}' for i in range(1, 29)]
-# target = 'Class'
+numeric_features_to_scale = ['Time', 'Amount']
+passthrough_features = [f'V{i}' for i in range(1, 29)]
+target = 'Class'
 
-# X = df[numeric_features_to_scale + passthrough_features]
-# y = df[target]
+X = df[numeric_features_to_scale + passthrough_features]
+y = df[target]
 
 # 3. Split Data
 # --- CRITICAL: stratify=y ensures both train and test sets have the same (imbalanced) class proportion ---
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
 # 4. Preprocessing
-# preprocessor = ColumnTransformer(
-#     transformers=[
-#         ('num', StandardScaler(), numeric_features_to_scale)
-#     ],
-#     remainder='passthrough' # Keep V1-V28 as they are
-# )
-# X_train_processed = preprocessor.fit_transform(X_train)
-# X_test_processed = preprocessor.transform(X_test)
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numeric_features_to_scale)
+    ],
+    remainder='passthrough' # Keep V1-V28 as they are
+)
+X_train_processed = preprocessor.fit_transform(X_train)
+X_test_processed = preprocessor.transform(X_test)
 
 # 5. Initialize and Train Model
 # --- CRITICAL: class_weight='balanced' tells the model to penalize errors on the minority class (fraud) more heavily ---
-# model = LogisticRegression(random_state=42, class_weight='balanced')
-# model.fit(X_train_processed, y_train)
+model = LogisticRegression(random_state=42, class_weight='balanced')
+model.fit(X_train_processed, y_train)
 
 # 6. Evaluate Model
-# y_pred = model.predict(X_test_processed)
-# print("\nClassification Report (Focus on Recall for Class 1):")
-# print(classification_report(y_test, y_pred))
+y_pred = model.predict(X_test_processed)
+print("\nClassification Report (Focus on Recall for Class 1):")
+print(classification_report(y_test, y_pred))
 
 print("Code placeholder for creditcard.csv. Note 'stratify=y' and 'class_weight=balanced'.")
-</pre>
-</body>
+</pre
+    >
+  </body>
 </html>
